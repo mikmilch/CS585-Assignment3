@@ -6,10 +6,10 @@ from faker import Faker
 units = 1000#0000
 infected = 100 #random.randint(10000, 1000000)
 
-features = ["ID", "x", "y", "Name", "Age"]
-PEOPLE_large = pd.DataFrame(columns=features)
-INFECTED_small = pd.DataFrame(columns=features)
 
+features = ["ID", "x", "y", "Name", "Age"]
+global INFECTED_small
+PEOPLE_large = pd.DataFrame(columns=features)
 
 features2 = ["ID", "x", "y", "Name", "Age", "Infected"]
 
@@ -32,6 +32,7 @@ def check(x, y):
         ylist.append(y)
 
 def peopleLargeCreation():
+
 
     # generating names
     faker = Faker()
@@ -62,46 +63,22 @@ def checkInfected(i):
         checkInfected(newi)
     else:
         infectedPerson.add(i)
-        return i
 
 
 def infectedSmallCreation(large):
+    INFECTED_small = pd.DataFrame(columns=features)
 
-    print(large[large["ID"] == 1])
-    # df2 = df2.append(df1[df1['Adj.Factor'] == 0])
 
     for i in range(infected):
-        # print(i)
-        index = checkInfected(random.randint(1, units))
+        checkInfected(random.randint(1, units))
 
-        INFECTED_small = pd.concat([INFECTED_small, (large[large[["ID"] == index]])])
+    for index in infectedPerson:
+        INFECTED_small = (pd.concat([INFECTED_small, large[large["ID"] == index]], ignore_index=True))
 
-        # current = large[large["ID"] == index]
-        #
-        # INFECTED_small.insert(current)
-        # print(INFECTED_small)
-        # print(current)
-        #
-        # INFECTED_small[i]["ID"] = current["ID"]
-        # INFECTED_small[i]["x"] = current["x"]
-        # INFECTED_small[i]["y"] = current["y"]
-        # INFECTED_small[i]["Name"] = current["Name"]
-        # INFECTED_small[i]["Age"] = current["Age"]
+
 
     print(INFECTED_small)
 
-#def peopleSomeInfectedLarge(infectedSmall, peopleLarge):
-# PEOPLE_SOME_INFECTED_large["Name"] = peopleLarge["Name"]
-# PEOPLE_SOME_INFECTED_large["ID"] = peopleLarge["ID"]
-# PEOPLE_SOME_INFECTED_large["age"] = peopleLarge["Age"]
-# PEOPLE_SOME_INFECTED_large["x"] = peopleLarge["x"]
-# PEOPLE_SOME_INFECTED_large["y"] = peopleLarge["y"]
-
-# for id in PEOPLE_SOME_INFECTED_large:
- #   if i in infectedSmall["ID"]:
-#       PEOPLE_SOME_INFECTED_large[id]["Infected"] = "Yes"
-#   else:
-#       PEOPLE_SOME_INFECTED_large[id]["Infected"] = "No"
 
 
 if __name__ == '__main__':
