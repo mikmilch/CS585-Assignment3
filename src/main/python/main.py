@@ -54,7 +54,7 @@ def peopleLargeCreation():
 
     print(PEOPLE_large)
     
-   # PEOPLE_large.to_csv("people_large_test.csv", index=False)
+    PEOPLE_large.to_csv("people_large_test.csv", index=False)
 
 infectedPerson = set()
 
@@ -80,7 +80,7 @@ def infectedSmallCreation(large):
 
 
     print(INFECTED_small)
-    # INFECTED_small.to_csv("infected_small_test.csv", index=False)
+    INFECTED_small.to_csv("infected_small_test.csv", index=False)
 
 def peopleSomeInfected(large):
     
@@ -103,8 +103,9 @@ def peopleSomeInfected(large):
         PEOPLE_SOME_INFECTED_large["Infected"][i] = PEOPLE_SOME_INFECTED_large["ID"][i] in infectedPerson
         
     PEOPLE_SOME_INFECTED_large["Infected"] = PEOPLE_SOME_INFECTED_large["Infected"].replace({True: 'Yes', False: 'No'})
-    
-    # PEOPLE_SOME_INFECTED_large.to_csv("people_some_infected_test.csv", index=False)
+
+    print(PEOPLE_SOME_INFECTED_large)
+    PEOPLE_SOME_INFECTED_large.to_csv("people_some_infected_test.csv", index=False)
 
 
 
