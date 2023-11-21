@@ -53,6 +53,8 @@ def peopleLargeCreation():
     PEOPLE_large["y"] = ylist
 
     print(PEOPLE_large)
+    
+   # PEOPLE_large.to_csv("people_large_test.csv", index=False)
 
 infectedPerson = set()
 
@@ -78,9 +80,36 @@ def infectedSmallCreation(large):
 
 
     print(INFECTED_small)
+    # INFECTED_small.to_csv("infected_small_test.csv", index=False)
+
+def peopleSomeInfected(large):
+    
+    # the following columns should be the same as PEOPLE_large
+    
+    # ID
+    PEOPLE_SOME_INFECTED_large["ID"] = large["ID"]
+    
+    # x and y
+    PEOPLE_SOME_INFECTED_large["x"] = large["x"]
+    PEOPLE_SOME_INFECTED_large["y"] = large["y"]
+    
+    # Name
+    PEOPLE_SOME_INFECTED_large["Name"] = large["Name"]
+    
+    # Age 
+    PEOPLE_SOME_INFECTED_large["Age"] = large["Age"]
+    
+    for i in range(len(PEOPLE_SOME_INFECTED_large)):
+        PEOPLE_SOME_INFECTED_large["Infected"][i] = PEOPLE_SOME_INFECTED_large["ID"][i] in infectedPerson
+        
+    PEOPLE_SOME_INFECTED_large["Infected"] = PEOPLE_SOME_INFECTED_large["Infected"].replace({True: 'Yes', False: 'No'})
+    
+    # PEOPLE_SOME_INFECTED_large.to_csv("people_some_infected_test.csv", index=False)
 
 
 
 if __name__ == '__main__':
     peopleLargeCreation()
     infectedSmallCreation(PEOPLE_large)
+    peopleSomeInfected(PEOPLE_large)
+    
