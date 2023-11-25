@@ -6,8 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Spark_WordCount_Scala" />
+        <module name="Assignment3" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Spark_WordCount_Scala" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
