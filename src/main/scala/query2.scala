@@ -2,7 +2,7 @@ import org.apache.spark
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
-object query1 {
+object query2 {
 
   def main(args: Array[String]): Unit = {
 
@@ -28,28 +28,38 @@ object query1 {
       (current(0), (current(1).toInt, current(2).toInt))
     })
 
-    // Cartesian
     val join = largeMap.cartesian(smallMap)
 
-    // Infecting self
-    val filter = join.filter{
-        case (pi, infected) => {
-          val distance = Math.sqrt(Math.pow((pi._2._2 - infected._2._2), 2) + Math.pow((pi._2._1 - infected._2._1), 2))
-          distance <= 6
-        }
+
+    val filter = join.filter {
+      case (pi, infected) => {
+        val distance = Math.sqrt(Math.pow((pi._2._2 - infected._2._2), 2) + Math.pow((pi._2._1 - infected._2._1), 2))
+        distance <= 6
+      }
     }
 
     val result = filter.map{
-        case (pi, infected) => {
-          (pi._1, infected._1)
-        }
+      case (pi, infected) => {
+        (pi._1, infected._1)
+      }
     }
 
+    var list: List[Int] = List()
 
-    result.saveAsTextFile("query1")
+    val distinct = result
+      .filter{
+        case(pi, infected) =>
+          list = list.::(pi.toInt)
 
+          for (test <- list){
+            print(test)
+          }
+
+          (list.count(x => x == pi.toInt) < 2)
+      }
+
+    distinct.saveAsTextFile("query2")
 
 
   }
-
 }
