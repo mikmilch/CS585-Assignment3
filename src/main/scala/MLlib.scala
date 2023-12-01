@@ -7,6 +7,8 @@ import org.apache.spark.ml.regression.{DecisionTreeRegressor, LinearRegression, 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.sum
 import org.apache.spark.mllib
+import org.apache.spark.ml.evaluation.RegressionEvaluator
+import org.apache.spark.mllib.evaluation.RegressionMetrics
 
 
 object MLlib {
@@ -47,9 +49,11 @@ object MLlib {
     //and Testset, such that Trainset contains 80% of Dataset and Testset the remaining 20%. (2
     //points)
 
-    val splits = Dataset.randomSplit(Array(0.80, 0.20))
+    val splits = Dataset.randomSplit(Array(0.80, 0.20), seed = 1)
     print("Training\n")
     val Trainset = splits(0).cache() //.show()
+
+//    Trainset.write.csv("trainset.csv")
 
     print("Testing\n")
     val Testset = splits(1) //.show()
@@ -74,15 +78,14 @@ object MLlib {
     val lr = new LinearRegression().setFeaturesCol("features").setLabelCol("TransTotal")
     val linearRegressionModel = lr.fit(linear)
 
-
-    linearRegressionModel.transform(assembler.transform(Testset)).show()
+    val linearPrediction = linearRegressionModel.transform(assembler.transform(Testset)) //.show()
 
     // Train a DecisionTree model.
     val decisionTreeRegression = new DecisionTreeRegressor().setFeaturesCol("features").setLabelCol("TransTotal")
 
     val decisionTreeRegressionModel = decisionTreeRegression.fit(linear)
 
-    decisionTreeRegressionModel.transform(assembler.transform(Testset)).show()
+    val decisionTreePrediction = decisionTreeRegressionModel.transform(assembler.transform(Testset)) //.show()
 
 
     // Train a RandomForest model.
@@ -90,7 +93,7 @@ object MLlib {
 
     val randomForestRegressionModel = randomForestRegression.fit(linear)
 
-    randomForestRegressionModel.transform(assembler.transform(Testset)).show()
+    val randomForestPrediction = randomForestRegressionModel.transform(assembler.transform(Testset)) //.show()
 
 
 
@@ -108,15 +111,68 @@ object MLlib {
 
     // Linear Regression
 
+    // Get predictions
+//    val valuesAndPreds = linsTotal
+//    )
+//  }
+//
+//  // Instantiate metrics object
+//  val metrics = new RegressionMetrics(linearPrediction.select("prediction", "TransTotal"));
 
 
+    // Select the columns "prediction" and "TransTotal" for evaluation
+    val RMSEevaluator = new RegressionEvaluator()
+      .setLabelCol("TransTotal")
+      .setPredictionCol("prediction")
+      .setMetricName("rmse") // You can use other metrics like "mse", "mae", "r2"
+
+    val R2evaluator = new RegressionEvaluator()
+      .setLabelCol("TransTotal")
+      .setPredictionCol("prediction")
+      .setMetricName("r2") // You can use other metrics like "mse", "mae", "r2"
+
+    val MAEevaluator = new RegressionEvaluator()
+      .setLabelCol("TransTotal")
+      .setPredictionCol("prediction")
+      .setMetricName("mae") // You can use other metrics like "mse", "mae", "r2"
+
+    // Evaluate the model
+    val rmse = RMSEevaluator.evaluate(linearPrediction)
+    val r2 = R2evaluator.evaluate(linearPrediction)
+    val mae = MAEevaluator.evaluate(linearPrediction)
+
+    // Print the metrics (RMSE, R2, MAE)
+    println(s"Linear Regression Evaluation Metrics:")
+    println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
+    println(s"R-Squared (R2) on test data = $r2")
+    println(s"Mean Absolute Error (MAE) on test data = $mae")
 
     // Decision Tree Regression
+
+    // Evaluate the model
+    val rmse_t = RMSEevaluator.evaluate(decisionTreePrediction)
+    val r2_t = R2evaluator.evaluate(decisionTreePrediction)
+    val mae_t = MAEevaluator.evaluate(decisionTreePrediction)
+
+    // Print the metrics
+    println(s"Decision Tree Regression Evaluation Metrics:")
+    println(s"Root Mean Squared Error (RMSE) on test data = $rmse_t")
+    println(s"R-Squared (R2) on test data = $r2_t")
+    println(s"Mean Absolute Error (MAE) on test data = $mae_t")
 
 
     // Random Forest Regression
 
+    // Evaluate the model
+    val rmse_f = RMSEevaluator.evaluate(randomForestPrediction)
+    val r2_f = R2evaluator.evaluate(randomForestPrediction)
+    val mae_f = MAEevaluator.evaluate(randomForestPrediction)
 
+    // Print the metrics
+    println(s"Random Forest Regression Evaluation Metrics:")
+    println(s"Root Mean Squared Error (RMSE) on test data = $rmse_f")
+    println(s"R-Squared (R2) on test data = $r2_f")
+    println(s"Mean Absolute Error (MAE) on test data = $mae_f")
 
   }
 

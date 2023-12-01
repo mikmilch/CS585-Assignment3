@@ -1,7 +1,7 @@
 package main.scala
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.functions.{avg, ceil, col, collect_list, count, row_number, slice, sort_array, sum}
+import org.apache.spark.sql.functions.{avg, ceil, col, collect_list, count, row_number, slice, sort_array, sum, min, max}
 //import org.apache.spark.sql.*
 
 
@@ -44,7 +44,7 @@ object SQL {
     //Report the result back to the client side. (5 points)
     print("Task 2.2\n")
 
-    val test = T1.groupBy("TransNumItems").agg(sort_array(collect_list("TransTotal")).as("List"), ceil(count("TransTotal")/2).as("Count"), avg("TransTotal")) //.show()
+    val test = T1.groupBy("TransNumItems").agg(sort_array(collect_list("TransTotal"))(ceil(count("TransTotal")/2)).as("Median"), min("TransTotal").as("Min"), max("TransTotal").as("Max")).sort("TransNumItems").show()
 
     //test1.head().getAs[Long]("Count").toInt
 
