@@ -10,43 +10,53 @@ object query1 {
 
     val sc = new SparkContext(sparConf)
 
-    val large: RDD[String] = sc.textFile("src/main/scala/people_large_test.csv")
-    val small: RDD[String] = sc.textFile("src/main/scala/infected_small_test.csv")
+    // Files
+    val large: RDD[String] = sc.textFile("file:///C:/Users/nickl/OneDrive/Desktop/data/Project3/people_large_test.csv")
+    val small: RDD[String] = sc.textFile("file:///C:/Users/nickl/OneDrive/Desktop/data/Project3/infected_small_test.csv")
 
+    // Get each line
     val largeLine: RDD[String] = large.flatMap(_.split("\n"))
     val smallLine: RDD[String] = small.flatMap(_.split("\n"))
 
-    val largeMap = largeLine.map(test => {
 
+    // Get the (ID, (x, y))
+    val largeMap = largeLine.map(test => {
       val current = test.split(",")
       (current(0), (current(1).toInt, current(2).toInt))
     })
 
     val smallMap = smallLine.map(test => {
-
       val current = test.split(",")
       (current(0), (current(1).toInt, current(2).toInt))
     })
 
-    // Cartesian
+    // Cartesian (Map every infected person with every other person)
     val join = largeMap.cartesian(smallMap)
 
-    // Infecting self
+    // Filter for only those in range
     val filter = join.filter{
         case (pi, infected) => {
           val distance = Math.sqrt(Math.pow((pi._2._2 - infected._2._2), 2) + Math.pow((pi._2._1 - infected._2._1), 2))
           distance <= 6
         }
     }
+      // Cannot infect oneself
+      .filter{
+        case(pi, infected) => {
+          pi._1 != infected._1
+        }
+      }
 
+    // Result (pi, infected)
     val result = filter.map{
         case (pi, infected) => {
+          println(pi._1)
           (pi._1, infected._1)
         }
     }
 
 
-    result.saveAsTextFile("query1")
+    result.saveAsTextFile("query1Test_1")
 
 
 

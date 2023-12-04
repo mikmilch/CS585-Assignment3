@@ -3,8 +3,9 @@ import random
 from faker import Faker
 
 
-units = 1000#0000
-infected = 100 #random.randint(10000, 1000000)
+units = 100000#00
+infected = random.randint((units/1000), (units/10))
+# infected = random.randint(10000, 1000000)
 
 
 features = ["ID", "x", "y", "Name", "Age"]
@@ -54,33 +55,38 @@ def peopleLargeCreation():
 
     print(PEOPLE_large)
     
-    PEOPLE_large.to_csv("people_large_test.csv", index=False)
+    PEOPLE_large.to_csv("people_large2.csv", index=False)
 
 infectedPerson = set()
 
-def checkInfected(i):
-    if (i in infectedPerson):
-        newi = random.randint(1, units)
-
-        checkInfected(newi)
-    else:
-        infectedPerson.add(i)
+# def checkInfected(i):
+#     if (i in infectedPerson):
+#         newi = random.randint(1, units)
+#
+#         checkInfected(newi)
+#     else:
+#         infectedPerson.add(i)
 
 
 def infectedSmallCreation(large):
     INFECTED_small = pd.DataFrame(columns=features)
 
+    INFECTED_small = large.sample(infected)
 
-    for i in range(infected):
-        checkInfected(random.randint(1, units))
+    infectedPerson.update(INFECTED_small["ID"].tolist())
+    # infectedPerson.add(INFECTED_small["ID")
 
-    for index in infectedPerson:
-        INFECTED_small = (pd.concat([INFECTED_small, large[large["ID"] == index]], ignore_index=True))
+    #
+    # for i in range(infected):
+    #     checkInfected(random.randint(1, units))
+    #
+    # for index in infectedPerson:
+    #     INFECTED_small = (pd.concat([INFECTED_small, large[large["ID"] == index]], ignore_index=True))
 
 
 
     print(INFECTED_small)
-    INFECTED_small.to_csv("infected_small_test.csv", index=False)
+    INFECTED_small.to_csv("infected_small2.csv", index=False)
 
 def peopleSomeInfected(large):
     
@@ -98,18 +104,33 @@ def peopleSomeInfected(large):
     
     # Age 
     PEOPLE_SOME_INFECTED_large["Age"] = large["Age"]
-    
+
+    infectedList = []
+
     for i in range(len(PEOPLE_SOME_INFECTED_large)):
-        PEOPLE_SOME_INFECTED_large["Infected"][i] = PEOPLE_SOME_INFECTED_large["ID"][i] in infectedPerson
-        
-    PEOPLE_SOME_INFECTED_large["Infected"] = PEOPLE_SOME_INFECTED_large["Infected"].replace({True: 'Yes', False: 'No'})
+        if (i + 1 in infectedPerson):
+            infectedList.append("Yes")
+        else:
+            infectedList.append("No")
+        # infectedList[i] = i in infectedPerson
+        print(infectedList[i])
+
+    PEOPLE_SOME_INFECTED_large["Infected"] = infectedList
+    # for i in range(len(PEOPLE_SOME_INFECTED_large)):
+    #     PEOPLE_SOME_INFECTED_large["Infected"][i] = PEOPLE_SOME_INFECTED_large["ID"][i] in infectedPerson
+    #
+    # PEOPLE_SOME_INFECTED_large["Infected"] = PEOPLE_SOME_INFECTED_large["Infected"].replace({True: 'Yes', False: 'No'})
+
+
 
     print(PEOPLE_SOME_INFECTED_large)
-    PEOPLE_SOME_INFECTED_large.to_csv("people_some_infected_test.csv", index=False)
+    PEOPLE_SOME_INFECTED_large.to_csv("people_some_infected2.csv", index=False)
 
 
 
 if __name__ == '__main__':
+
+
     peopleLargeCreation()
     infectedSmallCreation(PEOPLE_large)
     peopleSomeInfected(PEOPLE_large)

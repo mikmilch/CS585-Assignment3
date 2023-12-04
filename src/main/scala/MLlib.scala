@@ -21,19 +21,20 @@ object MLlib {
 
   def main(args: Array[String]): Unit = {
 
+    // Files
     val customers = spark.read.option("header", "true").option("inferSchema", "true").csv("C:/Users/nickl/OneDrive/Desktop/data/CustomersTest.csv").toDF()
     val transactions = spark.read.option("header", "true").option("inferSchema", "true").csv("C:/Users/nickl/OneDrive/Desktop/data/TransactionsTest.csv").toDF()
 
     customers.createOrReplaceTempView("Customers")
     transactions.createOrReplaceTempView("Transactions")
 
+    // Tables
     customers.show()
     transactions.show()
     transactions.printSchema()
 
     //Task 2.5) Data Preparation 1: Generate a dataset composed of customer ID, TransID,
     //Age, Salary, TransNumItems and TransTotal. Store it as Dataset. (3 points)
-
 
     val purchasestransactions = transactions.select(transactions("TransID"), transactions("CustID"), transactions("TransTotal"), transactions("TransNumItems")) //.show()
 
@@ -42,6 +43,9 @@ object MLlib {
 
     val Dataset = purchasestransactions.join(customersAge, purchasestransactions("CustID") === customersAge("ID")).sort("CustID").drop("ID") //.show()
 
+    println("Task 2.5")
+    println("Dataset")
+    Dataset.show()
 
 
 
@@ -49,14 +53,16 @@ object MLlib {
     //and Testset, such that Trainset contains 80% of Dataset and Testset the remaining 20%. (2
     //points)
 
+    println("\nTask 2.6")
+
     val splits = Dataset.randomSplit(Array(0.80, 0.20), seed = 1)
-    print("Training\n")
+    println("Training")
     val Trainset = splits(0).cache() //.show()
+    Trainset.show()
 
-//    Trainset.write.csv("trainset.csv")
-
-    print("Testing\n")
+    println("Testing")
     val Testset = splits(1) //.show()
+    Testset.show()
 
 
     //Task 2.7) Predict the price: Identify and train at least 3 machine learning algorithms to
@@ -66,7 +72,8 @@ object MLlib {
     //is TransTotal. The algorithms should be trained over Trainset (Task 2.6) and applied
     //(inference) over Testset (Task 2.6). (10 points)
 
-//
+    println("\nTask 2.7")
+
     val assembler = new VectorAssembler()
       .setInputCols(Array("Age", "Salary", "TransNumItems"))
       .setOutputCol("features")
@@ -80,12 +87,19 @@ object MLlib {
 
     val linearPrediction = linearRegressionModel.transform(assembler.transform(Testset)) //.show()
 
+    println("Linear Regression Model")
+    linearPrediction.show()
+
+
     // Train a DecisionTree model.
     val decisionTreeRegression = new DecisionTreeRegressor().setFeaturesCol("features").setLabelCol("TransTotal")
 
     val decisionTreeRegressionModel = decisionTreeRegression.fit(linear)
 
     val decisionTreePrediction = decisionTreeRegressionModel.transform(assembler.transform(Testset)) //.show()
+
+    println("DecisionTree Model")
+    decisionTreePrediction.show()
 
 
     // Train a RandomForest model.
@@ -95,13 +109,9 @@ object MLlib {
 
     val randomForestPrediction = randomForestRegressionModel.transform(assembler.transform(Testset)) //.show()
 
+    println("RandomForest Model")
+    randomForestPrediction.show()
 
-
-//    val logisticRegression = new LogisticRegression().setFeaturesCol("features").setLabelCol("TransTotal")
-//
-//    val logisticRegressionModel = logisticRegression.fit(linear)
-//
-//    logisticRegressionModel.transform(assembler.transform(Testset)).show()
 
 
     //Task 2.8) Predict the price: Identify and use at least 3 metrics to evaluate the algorithms
@@ -109,15 +119,9 @@ object MLlib {
     //(https://spark.apache.org/docs/1.6.1/mllib-evaluation-metrics.html#regression-model-
     //evaluation). (10 points)
 
+    println("\nTask 2.8")
     // Linear Regression
 
-    // Get predictions
-//    val valuesAndPreds = linsTotal
-//    )
-//  }
-//
-//  // Instantiate metrics object
-//  val metrics = new RegressionMetrics(linearPrediction.select("prediction", "TransTotal"));
 
 
     // Select the columns "prediction" and "TransTotal" for evaluation
